@@ -17,12 +17,16 @@ type PostType = Omit<PostDataType, "slug" | "content">;
 
 const postsDirectory = path.join(process.cwd(), "posts");
 
-const getPostData = (fileName: string) => {
-  const filePath = path.join(postsDirectory, fileName);
+export const getPostsFiles = () => {
+  return fs.readdirSync(postsDirectory);
+};
+
+export const getPostData = (postIdentifier: string) => {
+  const postSlug = postIdentifier.replace(/\.md$/, ""); //확장자 없는 파일 이름
+
+  const filePath = path.join(postsDirectory, `${postSlug}.md`);
   const fileContent = fs.readFileSync(filePath, "utf-8");
   const { data, content } = matter(fileContent);
-
-  const postSlug = fileName.replace(/\.md$/, ""); //확장자 없는 파일 이름
 
   const postData: PostDataType = {
     slug: postSlug,
@@ -34,8 +38,7 @@ const getPostData = (fileName: string) => {
 };
 
 export const getAllPosts = () => {
-  const postFiles = fs.readdirSync(postsDirectory);
-
+  const postFiles = getPostsFiles();
   const allPosts = postFiles.map((postFile) => getPostData(postFile));
 
   const sortedPosts = allPosts.sort((postA, postB) =>
