@@ -3,6 +3,18 @@ import path from "path";
 
 import matter from "gray-matter";
 
+export type PostDataType = {
+  slug: string;
+  content: string;
+  title: string;
+  date: string;
+  image: string;
+  excerpt: string;
+  isFeatured: boolean;
+};
+
+type PostType = Omit<PostDataType, "slug" | "content">;
+
 const postsDirectory = path.join(process.cwd(), "posts");
 
 const getPostData = (fileName: string) => {
@@ -12,9 +24,9 @@ const getPostData = (fileName: string) => {
 
   const postSlug = fileName.replace(/\.md$/, ""); //확장자 없는 파일 이름
 
-  const postData = {
+  const postData: PostDataType = {
     slug: postSlug,
-    ...data,
+    ...(data as PostType),
     content,
   };
 
@@ -24,7 +36,7 @@ const getPostData = (fileName: string) => {
 export const getAllPosts = () => {
   const postFiles = fs.readdirSync(postsDirectory);
 
-  const allPosts: any[] = postFiles.map((postFile) => getPostData(postFile));
+  const allPosts = postFiles.map((postFile) => getPostData(postFile));
 
   const sortedPosts = allPosts.sort((postA, postB) =>
     postA.date > postB.date ? -1 : 1
